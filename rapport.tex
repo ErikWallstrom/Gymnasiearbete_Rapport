@@ -47,14 +47,19 @@ ogillar, med mera. Genom att skapa ett eget programmeringsspråk så kan jag
 anpassa och förbättra vissa delar så att det blir det perfekta 
 programmeringsspråket för mig. 
 
-
 \subsection{Bakgrund}
 
 Jag har gått kursen Programmering 1, och går just nu i Programmering 2. Jag har
 tidigare erfarenhet av många programmeringsspråk samt \textit{git}, samt skapat 
 en interpretator för programmeringsspråket \textit{Brainfuck}. Jag har även 
 konstruerat en textredigerare och utvecklingsmiljö för programmeringsspråket
-\textit{Lua}, där jag bland annat haft förgmarkeringar för syntax. 
+\textit{Lua}, där jag bland annat haft förgmarkeringar för syntax. Språket som
+jag har mest erfarenhet av är C, vilket även är mitt favoritspråk och grunden
+till mycket inom detta nya språk. Detta gör att jag bedömer att mina kunskaper
+är tillräckliga.
+
+Detta projekt kommer fungera som en övning för relativt avancerad programmering,
+structurering och arbete av stort projekt. 
 
 \subsection{Syfte}
 
@@ -76,7 +81,7 @@ Under projektets gång vill jag försöka utforska och svara på dessa frågor s
 jag hade från början. 
 
 \begin{itemize}
-	\item Vilka delar är en kompilator uppbyggd av?
+	\item Vilka delar är en kompilator uppbyggd av och varför?
 		
 		Alla stora program är uppbyggda av olika delar som tillsammans utför en 
 		uppgift. Så vilka delar är det som en modern kompilator för ett språk
@@ -137,11 +142,12 @@ Några specifika specifikationer på språket kommer vara följande:
 
 \subsection{Metod och material}
 
+Projektet bygger på research utifrån tekniska artiklar och wikipedia mm. 
 Projektet är skrivet i ren gnu-11 C kod med hjälp av ett textredigeringsprogram 
 (vim) i operativsystemet Arch Linux och kompilerat med kompilatorn GCC. Inga 
 externa bibliotek och API:er har använts, utan allt är skrivet från grunden. För
 versionhantering har git använts, och för debugging har gdb och valgrind 
-använts.
+använts. 
 
 Motivera....
 
@@ -149,12 +155,212 @@ Motivera....
 This subsection's content...
 
 \section{Resultatredovisning}
-This section's content...
 
-\subsection{}
+\subsection{Arbetsgången}
+
+Under de första veckorna var det endast planering, research om ämnet, 
+brainstorming av idéer samt design av syntax som gällde. \\
+
+\noindent\textbf{2017-10-17}\\
+\noindent\rule{\textwidth}{1pt}
+
+\noindent 
+Första prototypen av en lexer samt alla grundläggande strukturer blev klara 
+idag. Eftersom att standard-biblioteket i C saknar mycket behövde jag 
+implementera bland annat dynamiska generiska listor, hantering av färgkoder
+för Linux-terminalen samt en abstraktion av filhanteringgränssnittet. Lexern 
+har enkel felrapportering där både rad och kolumn där felet hittades visas, 
+operatorer, nyckelord, identifierare samt sträng-, boolean- och 
+nummerlitteraler, mångradiga kommentarer som kan vara nested. \\
+
+\noindent\textbf{2017-10-19}\\
+\noindent\rule{\textwidth}{1pt}
+
+\noindent 
+Idag blev första parser-prototypen färdig. Jag skrev ett gränssnitt för 
+abstrakta syntaxträd, och lade till logisk utmatning så att man enkelt och 
+grafiskt kan se hur trädet är uppbyggt. Parsern är en recursive descent parser, 
+som använder tokens från lexern samt AST-gränsittet för att konstruera ett träd.
+Just nu stödjer det bland annat hantering av funktioner och block, med logiska 
+felrapporter. Jag upptäckte att syntaxen för flerradiga kommentarer orsakade 
+problem i vissa specifika fall, och ändrade därför i lexern för att lösa detta.
+\\
+
+\noindent\textbf{2017-10-20}\\
+\noindent\rule{\textwidth}{1pt}
+
+\noindent 
+Parsern stödjer nu numeriska uttryck med alla vanliga matematiska operatorerna,
+funktionsanrop samt variabeldeklarationer. Lexern stödjer nu även 
+bitwise-operatorer.\\
+
+\noindent\textbf{2017-10-22}\\
+\noindent\rule{\textwidth}{1pt}
+
+\noindent 
+Nu stödjer parsern även if-satser och booleanska uttryck.\\
+
+\noindent\textbf{2017-10-23}\\
+\noindent\rule{\textwidth}{1pt}
+
+\noindent 
+Idag började jag arbeta på semantisk analys av AST:t. Kompilatorn rapporterar 
+nu om odefinerade variabler, funktioner och typer, samt när du anropar en 
+funktion med inkorrekt antal argument med mera.  Jag skapade ett även ett 
+gränssnitt för scopes, fixade så att parsern nu kan hantera typdeklarationer och
+return statements, och började komma på idéer om syntax för listor samt 
+referenser för språket. \\
+
+\noindent\textbf{2017-10-28}\\
+\noindent\rule{\textwidth}{1pt}
+
+\noindent 
+Jag har nu lyckats lägga till tester för logiska och numeriska operationer och
+funktionsdeklarationer. Parsern stödjer nu även typomvandlingar.\\
+
+\noindent\textbf{2017-10-29}\\
+\noindent\rule{\textwidth}{1pt}
+
+\noindent 
+Idag lade jag till så att parsern klarar av elseif och else satser, samt externa
+funktionsanrop. Dessutom lade jag till semantiska kontroller för 
+main-funktionen.\\
+
+\noindent\textbf{2017-11-01}\\
+\noindent\rule{\textwidth}{1pt}
+
+\noindent 
+Nu har jag lagt till experimentell kodgenerering. Jag var tvungen att själv 
+skapa en abstraktion av C-stränggränssnittet eftersom att det inte var 
+tillräckligt användbart för mina ändamål. \\
+
+\noindent\textbf{2017-11-02}\\
+\noindent\rule{\textwidth}{1pt}
+
+\noindent 
+Kompilatorn stödjer nu argument för att stödja frivillig utskrivning av AST och 
+tokens med mera. C har inget sådant bibliotek i standarden, så jag fick skriva 
+en API för POSIX-baserade kommandoradsargument.\\
+
+\noindent\textbf{2017-11-03}\\
+\noindent\rule{\textwidth}{1pt}
+
+\noindent 
+Kompilatorn stödjer nu automatisk kompilering av den genererade C koden med 
+hjälp av GCC. \\
+
+\noindent\textbf{2017-11-04}\\
+\noindent\rule{\textwidth}{1pt}
+
+\noindent 
+Parsern och kodgeneratorn stödjer nu tomma typer. Generatorn skapar nu korrekt 
+indenterad C kod, och genererar if-satser korrekt. Semantiska tester för externa
+funktionsanrop samt memory leaks i semantiska tester är nu fixade. \\
+
+\noindent\textbf{2017-11-05}\\
+\noindent\rule{\textwidth}{1pt}
+
+\noindent 
+Små förbättringar av funktionsgenereringen lades till.\\
+
+\noindent\textbf{2017-11-07}\\
+\noindent\rule{\textwidth}{1pt}
+
+\noindent 
+Idag lade jag till generering av uttryck samt extra semantisk information in i 
+AST noderna. Experimentell generering av lokala funktioner och funktionsanrop 
+lades även till. \\
+
+\noindent\textbf{2017-11-08}\\
+\noindent\rule{\textwidth}{1pt}
+
+\noindent 
+Idag fixade jag en bug som gjorde att lokala variabler inte genererades korrekt.
+\\
+
+\noindent\textbf{2017-11-26}\\
+\noindent\rule{\textwidth}{1pt}
+
+\noindent 
+Jag har nu arbetat i mer än två veckor med att omstrukturera hela 
+projektet.  Anledningen var att felrapporteringen inte var tillräckligt bra, 
+samt att mycket blev rörigt. Det var bättre att strukurera om helt än att ändra 
+på allt som redan var skrivet bedömde jag. Hela projektet är nu betydligt bättre
+strukturerat vilket gör att ändringar blir enklare. Felrapporteringen är nu 
+tydlig och färgkodad. Semantiska analyser för oanvända och oinitierade variabler
+fungerar nu korrekt, och parsern stödjer nu tomma return-statements. \\
+
+\noindent\textbf{2017-12-01}\\
+\noindent\rule{\textwidth}{1pt}
+
+\noindent 
+Semantisk analys för att se om funktioner returnerar korrekt fungerar nu. Jag 
+fixade även lite memory leaks som jag upptäckte. Jag började även med 
+enkel optimering, men det visade sig vara betydligt svårare än jag trodde.\\
+
+\noindent\textbf{2017-12-21}\\
+\noindent\rule{\textwidth}{1pt}
+
+\noindent 
+Under veckan har jag testat att implementera en enkelt interpretator för 
+compile-time execution av kod. Efter ett tag bedömde jag dock att detta var
+ett för stort ämne att börja på nu. \\
+
+\noindent\textbf{2017-12-29}\\
+\noindent\rule{\textwidth}{1pt}
+
+\noindent 
+Jag har lagt till små förbättringar till generator och testerna. Bland annat 
+klarar kodgeneratorn nu externa funktionsanrop, if-satser samt typkonversioner. 
+\\
+
+\noindent\textbf{2018-01-01}\\
+\noindent\rule{\textwidth}{1pt}
+
+\noindent 
+Återigen har jag fixad kodgeneratorn då den fortfarande hade vissa problem. 
+Lokala funktioner samt exponenter i uttryck fungerar nu som de ska göra.\\
+
+\noindent\textbf{2018-01-05}\\
+\noindent\rule{\textwidth}{1pt}
+
+\noindent 
+Idag gjorde jag så att parsern och generatorn hanterar defer-statements. \\
+
+\noindent\textbf{2018-01-06}\\
+\noindent\rule{\textwidth}{1pt}
+
+\noindent 
+While-loopar parse:as och generaras nu korrekt. Jag lade också till 
+förbättringar till felmeddelanden.\\
+
+\noindent\textbf{2018-01-20}\\
+\noindent\rule{\textwidth}{1pt}
+
+\noindent 
+Prestanda-tester har nu lagds till, så att man enkelt kan se hur lång tid varje
+komponent i kompilatorn tar. Fixade även några små fel som jag hittade.\\
+
+\noindent\textbf{2018-01-21}\\
+\noindent\rule{\textwidth}{1pt}
+
+\noindent 
+Ett riktigt typsystem har nu blivit implementerat. Det kan hantera listor, 
+pekare, funktioner, unioner, enumerationer structurer samt typdefinitioner.\\
+
+\subsection{Resultatet}
+
+Kompilatorn och språket är långt ifrån klart. Många av specifikationerna som 
+sattes i början av projektet han inte bli färdiga. Dock så är Erwall nu ett 
+fungerande programmeringsspråk som jag bland annat använde en matematiklektion,
+vilket tyder på att det redan är användbart och på vissa sätt till och med 
+bättre än C. Bland annat är typsystemet betydligt mer avancerat, och konstanter
+samt sematiska kontroller och felmeddelande är betydligt bättre i jämförelse. I 
+teorin skulle man kunna skriva vilka program som helst i det. 
 
 \section{Diskussion och slutsatser}
-This section's content...
+
+
 
 \section{Källförteckning}
 This section's content...

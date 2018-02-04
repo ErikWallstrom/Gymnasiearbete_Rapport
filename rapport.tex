@@ -13,6 +13,24 @@
 
 \selectlanguage{english}
 \begin{abstract}
+	The primary objective of this project is to implement a fully working 
+	imperative compiled high performance general purpose programming language in
+	C, from scratch without using any external libraries or application
+	programming interfaces. The language will be offering many modern features
+	with a consistent syntax, so that it can ultimately replace 
+	the C language in practice. Many commonly used tools will be used, such as
+	git, gcc, valgrind and gdb. I will go through the general compiler pipeline 
+	and implement each component step by step. I was not able to reach all the 
+	goals that was planned in the beginning, but the project was far 
+	from a failure. The final result was a functioning, turing complete 
+	programming language that could used for any computing task in theory. It 
+	already offers many improvements over C, and I belive that it will become a
+	complete replacement for C in the near future. The project would probably 
+	have become far more mature if I used existing tools such as a parser and 
+	lexer generator. A significant amount of time was used to implement 
+	interfaces that was missing in the C standard library, which means that I
+	probably would have had the time to implement more features for Erwall if
+	I used a scripting language such as python. 
 \end{abstract}
 
 \begin{flushleft}
@@ -25,131 +43,234 @@
 \newpage
 \pagenumbering{arabic}
 
+\noindent \large \textbf{OBS: Första utkast! Många stavfel, grammatikfel och 
+mycket innehåll saknas!}\\
 \section{Inledning}
 
-Jag har valt att skapa ett nytt programmeringsspråk som kan användas praktiskt. 
-Språket kommer att vara kompilerat samt ha statisk typning. Målet är att 
-konstruera en bättre version av det redan existerande programmeringsspråket C. 
-Projektet kommer att ha öppen källkod samt en fri upphovsrättslicens. Jag kommer
-använda det distribuerade versionshanteringssystemet \textit{git} för att hålla 
-ordning på utveckling och ändring av källkod, samt möjliggöra för andra 
-människor att bidra med förbättringar och ändringar. Detta är ett ganska 
-ambitiöst projekt.
+\normalsize
 
-Fokus på programmering och utvecklingen av en kompilator, fokus på språk och 
-standard senare. 
+Dagens informationssamhälle är helt beroende av datorer. Fler och fler
+jobb automatiseras, och behovet att kunna skapa och utveckla felsäkra program 
+som ska kunna köras på dem är större än någonsin. För att skapa ett 
+datorprogram måste man på något sätt kunna kommunicera med datorer för att 
+framföra vad man vill göra. Datorer förstår dock endast maskinkod; ettor och
+nollor. Man insåg redan på 1950-talet att det var ohållbart för människor att
+skriva maskinkod för hand, eftersom att det var oerhört tidskrävande och ledde
+ofta till fel. Därför skapade man så kallade programmeringsspråk; kod som
+består av text och siffror som är betydligt lättare för människor att hantera.
+Under åren har det skapats väldigt många olika programmeringsspråk. 
+
+Man kan dela upp programmeringsspråk i flera kategorier, bland annat dynamiska
+och statiska, generella och specifika, imperativa och deklarativa med mera. Ett 
+statiskt programmeringsspråk översätts till maskinkod med hjälp av ett program
+som kallas för en kompilator. Dynamiska språk använder sig istället av interpretatorer, som 
+är som virtuella maskiner som kör koden. Generella programmeringsspråk är språk 
+som kan användas till vad som helst, till exempel datorspel, 
+textredigeringsprogram eller webbläsare. Specifika programmeringsspråk är 
+endast avsedda för en enda uppgift, till exempel statistik eller 
+specialeffekter. Om du använder ett imperativt programmeringsspråk måste du 
+steg för steg förklara för datorn hur den ska göra för att lösa en uppgift, 
+medan du endast behöver säga vad du vill få löst i ett deklarativt språk. Man 
+paratar också ofta om hög- och lågnivåspråk. Ett lågnivåspråk är väldigt lik 
+maskinkod, och kan endast göra det som processorn kan göra, medan högnivåspråk 
+har många abstraktioner som gör att man kan ha variabler, funktioner och 
+procedurer som en processor inte direkt kan förstå.
+
+\subsection{Bakgrund}
 
 Programmering har varit min hobby i nästan 5 år, och under den tiden har jag 
 testat ett stort antal av de existerande programmeringsspråken. Dock så har jag 
 ännu inte hittat något språk som jag anser vara perfekt; antingen saknas 
 funktioner, eller så finns det onödiga och överflödiga funktioner som jag 
-ogillar, med mera. Genom att skapa ett eget programmeringsspråk så kan jag 
-anpassa och förbättra vissa delar så att det blir det perfekta 
-programmeringsspråket för mig. 
+ogillar, med mera. Därför har jag valt att skapa ett nytt imperativt statiskt
+högnivåprogrammeringsspråk som kan användas i praktiken. Genom att skapa ett 
+eget programmeringsspråk så kan jag anpassa och förbättra vissa delar så att det
+blir det perfekta programmeringsspråket för mig.  Projektet kommer att ha öppen 
+källkod samt en fri upphovsrättslicens. 
 
-\subsection{Bakgrund}
+Jag har gått kursen Programmering 1, och går just nu i Programmering 2. 
+Tidigare har jag skapat en interpretator för programmeringsspråket 
+\textit{Brainfuck}, en textredigerare och utvecklingsmiljö med syntax 
+highligting för programmeringsspråket \textit{Lua}. Jag har även
+erfarenhet av många programmeringsspråk, inklusive men inte begränsat till
+\textit{Java}, \textit{C}, \textit{Lua}, \textit{C++} och \textit{Ruby}. Allt 
+detta gör att jag bedömer att jag är tillräckligt kompetent för att klara detta 
+projekt, även om det är väldigt ambitiöst för en person. 
 
-Jag har gått kursen Programmering 1, och går just nu i Programmering 2. Jag har
-tidigare erfarenhet av många programmeringsspråk samt \textit{git}, samt skapat 
-en interpretator för programmeringsspråket \textit{Brainfuck}. Jag har även 
-konstruerat en textredigerare och utvecklingsmiljö för programmeringsspråket
-\textit{Lua}, där jag bland annat haft förgmarkeringar för syntax. Språket som
-jag har mest erfarenhet av är C, vilket även är mitt favoritspråk och grunden
-till mycket inom detta nya språk. Detta gör att jag bedömer att mina kunskaper
-är tillräckliga.
-
-Detta projekt kommer fungera som en övning för relativt avancerad programmering,
-structurering och arbete av stort projekt. 
+Mycket av detta nya språk kommer att bygga på programmeringsspråket C, som är 
+mitt favoritspråk och det språk som jag har mest erfarenhet av. C skapades på
+1970-talet och är ett statiskt högpresterande imperativt högnivåspråk, och är 
+idag ett av det mest använda programmeringsspråken. Många andra 
+programmeringsspråk är skapade i C, och det finns mycket resurser och 
+information om det eftersom att det är så pass populärt. Detta gör C till ett 
+väldigt bra språkval för just detta projektet. 
 
 \subsection{Syfte}
 
-Syftet med detta projekt är att i slutändan ha ett fungerande 
-programmeringsspråk som på sikt kan ersätta programmeringsspråket C, som idag 
-fortfarande är ett av de mest använda programmeringsspråket. Dessutom så ska det
-visa att ett programmeringsspråk inte är något märkvärdigt; många programmerare
-tänker klagar på programmeringsspråk, men ytterst få försöker förbättra dem 
-eftersom att mentaliteten att man inte ska återuppfinna det som redan finns, 
-samt att man inte ska byta ut det som redan fungerar. Detta leder till att 
-programmeringsspråk får en speciell status, och många tänker inte på att det 
-rör sig om en viss standard som är satt, eller ett program som helt enkelt 
-tolkar och översätter koden du skriver till maskinkod. Många tycker att det är 
-orimligt att skapa ett nytt programmeringsspråk.
+Syftet med detta projekt är att få fram ett fungerande programmeringsspråk som
+på sikt kan ersätta programmeringsspråket C. Språket ska ha en del moderna 
+egenskaper, göra det enklare för programmerare att skapa högpresterande
+och felsäkra program, samt göra det roligare att programmera. 
+
+Detta projekt ska dessutom visa att det inte är så märkvärdigt att skapa ett 
+programmeringsspråk; många programmerare klagar på programmeringsspråk, men 
+ytterst få försöker förbättra dem. Programmeringsspråk brukar ha en speciell 
+status, speciellt bland nybörjare, på grund av mentaliteten att man inte ska 
+återuppfinna det som redan finns, att det är för svårt, samt att man inte ska 
+byta ut det som redan fungerar. Många tycker därför att det är orimligt att 
+skapa ett nytt programmeringsspråk, och tänker inte på att det bara rör sig om 
+en viss standard som är satt, eller att en kompilator är ett program som helt 
+enkelt tolkar och översätter koden du skriver till maskinkod. 
+
+Detta projekt kommer även fungera som en övning för att träna på avancerad 
+programmering, strukturering och arbete av stort projekt och göra en till en 
+bättre programmerare. För att vara en bra programmerare måste man förstå hur 
+programmeringsspråk är uppbyggda och fungerar, vilket gör att detta projekt är 
+perfekt för ändamålet.
 
 \subsection{Frågeställningar}
 
-Under projektets gång vill jag försöka utforska och svara på dessa frågor som
-jag hade från början. 
-
 \begin{itemize}
 	\item Vilka delar är en kompilator uppbyggd av och varför?
-		
-		Alla stora program är uppbyggda av olika delar som tillsammans utför en 
-		uppgift. Så vilka delar är det som en modern kompilator för ett språk
-		generellt är uppbyggd av?
 
 	\item Hur bra fungerar C som ett programmeringsspråk för att skapa en 
 		kompilator?
 
-		Debatten om vilka språk som passar för vilka uppgifter har hållit på i 
-		många år. Språket som jag har mest erfarenhet av än så länge är C, så
-		hur bra passar det till just det här projektet? Vilka fördelar och 
-		nackdelar finns det då det är väldigt nära hårdvaran, samt att standard-
-		biblioteket är minimalt.
-
 	\item Är C ett bra mål att generera kod till?
-
-		Är det en bra idé att översätta koden skriven i det nya språket till C
-		kod istället för till exemepl maskinkod eller använda virtuella maskiner
-		som till exempel \textit{LLVM}? Vilka fördelar och nackdelar kan det ha?
-
-	\item Vad krävs av ett programmeringsspråk för att det ska anses som "bra"?
-
-		Vad är det egentligen som gör att folk gillar och ogillar språk? Var 
-		går balansen mellan bra och användbar? Skaparen av programmeringsspråket
-		C++ har bland annat sagt ``Det finns två olika typer av språk; språk som
-		folk klagar på, och språk som inte används``. 
 
 	\item Hur ska man planera ett projekt för att tillåta enkel felsökning och 
 		tillägg av nya funktioner?
-
-		Stora projekt så som detta kommer vara kommer kräva många ändringar och
-		försvåra felsökning och förbättringar. Vilka verktyg och praxis bör man
-		använda och följa för att förenkla detta?
 
 \end{itemize}
 
 \subsection{Kravspecifikation}
 
+\textbf{Generella krav:}
+
 \begin{itemize}
 	\item Logisk och konsekvent syntax
+
+		Många språk har ologisk och inkonsekvent form, där till exempel
+		funktionsdeklarationer inte ser likadana ut beroende på vart de
+		är deklarerade, och vissa variabeldeklarationer ser ut som matematiska
+		uttryck. Funktionsargument ser generellt sett inte ut som variabler, 
+		fastän de i praktiken är exakt likadana. Detta gör det jobbigt för 
+		programmerare, och därför ska sådana specialfall inte existera i Erwall.
+
 	\item Explicita deklarationer
-	\item Högpresterande och nära maskinvaran
+
+		När du låter kompilatorn gissa vad du vill att den ska göra kallas det 
+		för implicita deklarationer. Då skriver du inte ut exakt vad du vill att
+		den ska göra. Detta gör att det kan bli svårare att förstå koden, och 
+		kan leda till logiska fel. Därför ska Erwall endast ha explicita 
+		deklarationer.
+
+	\item Högpresterande
+
+		Vissa programmeringsspråk prioriterar hastigheten som man kan skapa 
+		program med framför hur snabbt programmet körs. Man kan tänka att man
+		föredrar kvantitet före kvalitet. Erwall kommer dock att prioritera 
+		hastigheten som programmet körs med, så att kvalitén på produkten 
+		programmeraren skapar blir så bra som den kan bli.\\
+
 \end{itemize}
 
-Några specifika specifikationer på språket kommer vara följande: 
+\noindent \textbf{Några specifika specifikationer på språket kommer vara 
+följande:}
 
 \begin{itemize}
-	\item Rekursiva omfång (?) med funktioner och kommentarer
-	\item Garanterade svansanrop (?)
-	\item Kompatibelt med C 
-	\item Strikt typsystem med riktiga konstanter
-	\item Inget odefinerat beteende
-	\item Listor som första klassens medborgare
-	\item Markerade unioner
+	\item Stöd för \textit{nested} kommentarer och funktioner
 
-	med mera.
+		I många programmeringsspråk kan du inte ha kommentarer i kommentarer, 
+		eller funktioner i funktioner. Detta är ologisk, och kan i många fall
+		göra det jobbigare för programmerare. 
+
+	\item Garanterade tail-call optimeringar
+
+		Vissa språk så som C har inte garanterade tail-call optimeringer, som 
+		ofta krävs för att programmera på ett funktionellt sätt; programmet 
+		kommer att krasha efter ett tag om man inte har det. Erwall kommer 
+		att stödja detta.
+
+	\item Kompatibelt med C 
+
+		Eftersom att C är ett så populärt och moget språk finns det väldigt 
+		många bibliotek och gränssnitt skrivna i C. Genom att göra Erwall 
+		kompatibelt med C kan man använda dessa redan skapade bibliotek istället
+		för att skapa allt från grunden, vilket är orimligt.
+
+	\item Strikt typsystem med riktiga konstanter
+
+		Många språk har inte strikta typsystem. Detta gör att till exempel 
+		heltal implicit kan omvandlas till decimaltal. Detta kommer inte vara 
+		tillåtet i Erwall.
+
+	\item Inget odefinerat beteende
+
+		I till exempel C kan man skriva kod som har odefinerat beteende; ingen 
+		vet vad som kommer hända. Detta gör att det blir lätt att skriva 
+		felaktig kod. I Erwall kommer all kod som kompileras vara korrekt och 
+		definerad, för att underlätta för debugging som ofta tar väldigt lång 
+		tid.
+
+	\item Listor som första klassens medborgare
+
+		En entitet som stödjer vanliga operationer, så som att de kan fungera 
+		som argument, returneras och tilldelas till variabler, kallas för första
+		klassens medborgare. I många språk är listor inte första klassens
+		medborgare, vilket gör att de sällan används. Istället används bibliotek
+		och andra gränssnitt. Erwall kommer att ha stöd för dem, så att man 
+		slipper detta. Listor behövs för nästan alla projekt, och bör vara 
+		inbyggda i språket. 
+
+	\item Tagged unions
+
+		En union är en datatyp som kan ha en av flera definerade typer. I C
+		vet man inte vilken av typerna unionen har. Detta gör att man själv
+		måste hålla koll på det. Erwall kommer att ha detta inbyggt, så att 
+		man själv slipper göra det.
+
 \end{itemize}
 
 \subsection{Metod och material}
 
-Projektet bygger på research utifrån tekniska artiklar och wikipedia mm. 
-Projektet är skrivet i ren gnu-11 C kod med hjälp av ett textredigeringsprogram 
-(vim) i operativsystemet Arch Linux och kompilerat med kompilatorn GCC. Inga 
-externa bibliotek och API:er har använts, utan allt är skrivet från grunden. För
-versionhantering har git använts, och för debugging har gdb och valgrind 
-använts. 
+Fokus lades på att skapa en fungerande kompilator. Språket kommer att anpassas
+och utvecklas efter hand. Detta gjordes då ett av målen var att språket ska
+kunna användas i praktiken. Hade det varit ett mer teoretiskt arbete skulle 
+fokus istället läggas på språk
+specifikationer och en standard. Projektet bygger
+på research utifrån tekniska artiklar, föreläsningar samt wikipedia. Utifrån
+informationen som samlades ihop skapades en projektplan som sedan följdes. Genom
+detta kunde frågeställningen ``vilka delar är en kompilator uppbyggd av`` besvaras.
 
-Motivera....
+En \textit{lexer} skapades först. Detta är den första komponenten i de
+flesta kompilatorer. Denna komponent delar upp koden i så kallade \textit{tokens},
+som används för att särskilja speciella kodord med identifierare, som är namn på
+variabler och funktioner som programmeraren kan definera. Därefter implementerades
+en \textit{parser}, som konstruerar ett abstrakt syntaxträd (AST) av \textit{tokens}, så att man tydligt
+kan se hierarki och gruppereringar. Efter det skapades en semantisk analysator, för
+att kontrollera om koden programmeraren har skrivet är logisk, till exempel om man
+verkligen kan addera text med nummer. Den semantiska analysator konstruerar även
+en symboltabell. Sedan skapades en kodgenerator, som tar trädet och symboltabellen 
+och genererar C kod. Till sist skapades ett typsystem. Vid implementationen av 
+kodgeneratorn kunde svaret till frågan om C är ett bra mål att generera kod till
+besvaras.
+
+Alla komponenter skrevs på en dator med Arch Linux i programmeringsspråket C 
+(gnu-c11) med hjälp av textredigeringsprogrammet \textit{vim} och kompilatorn
+\textit{gcc}, för att kunna besvara frågan om C fungerar bra för att skapa en
+kompilator. För felsökning och kontroller användes verktygen \textit{gdb} och
+\textit{valgrind}, som är standard för debugging av C program i Linux. Inga externa
+bibliotek eller \textit{application programming interfaces} (API)  har använts; allt är skrivet från grunden. Detta 
+gjordes så att man verkligen förstår processen. Om färdigskrivna gränssnitt hade 
+använts hade man inte kunnat anpassa det lika bra, och mycket av implementationen
+hade då varit färdiggjort och på så sätt hade det varit svårt att besvara många av
+frågeställningarna.
+
+Under projektets gång användes det distribuerade versionhanteringssystemet 
+\textit{git} för att hålla ordning på utveckling, ändring av kod och för att 
+förenkla felsökning. Dessutom möjliggjorde detta för andra människor att bidra
+med förbättringar och ändringar, då Erwalls kompilator har öppen källkod. 
 
 \subsection{Teoretisk bakgrund}
 This subsection's content...
@@ -190,7 +311,7 @@ problem i vissa specifika fall, och ändrade därför i lexern för att lösa de
 \noindent\rule{\textwidth}{1pt}
 
 \noindent 
-Parsern stödjer nu numeriska uttryck med alla vanliga matematiska operatorerna,
+\textit{Parser}n stödjer nu numeriska uttryck med alla vanliga matematiska operatorerna,
 funktionsanrop samt variabeldeklarationer. Lexern stödjer nu även 
 bitwise-operatorer.\\
 
@@ -198,7 +319,7 @@ bitwise-operatorer.\\
 \noindent\rule{\textwidth}{1pt}
 
 \noindent 
-Nu stödjer parsern även if-satser och booleanska uttryck.\\
+Nu stödjer \textit{parser}n även if-satser och booleanska uttryck.\\
 
 \noindent\textbf{2017-10-23}\\
 \noindent\rule{\textwidth}{1pt}
@@ -240,14 +361,14 @@ tillräckligt användbart för mina ändamål. \\
 \noindent 
 Kompilatorn stödjer nu argument för att stödja frivillig utskrivning av AST och 
 tokens med mera. C har inget sådant bibliotek i standarden, så jag fick skriva 
-en API för POSIX-baserade kommandoradsargument.\\
+en API för \textit{POSIX}-baserade kommandoradsargument.\\
 
 \noindent\textbf{2017-11-03}\\
 \noindent\rule{\textwidth}{1pt}
 
 \noindent 
 Kompilatorn stödjer nu automatisk kompilering av den genererade C koden med 
-hjälp av GCC. \\
+hjälp av C kompilatorn \textit{gcc}. \\
 
 \noindent\textbf{2017-11-04}\\
 \noindent\rule{\textwidth}{1pt}
@@ -283,7 +404,7 @@ Idag fixade jag en bug som gjorde att lokala variabler inte genererades korrekt.
 
 \noindent 
 Jag har nu arbetat i mer än två veckor med att omstrukturera hela 
-projektet.  Anledningen var att felrapporteringen inte var tillräckligt bra, 
+projektet. Anledningen var att felrapporteringen inte var tillräckligt bra, 
 samt att mycket blev rörigt. Det var bättre att strukurera om helt än att ändra 
 på allt som redan var skrivet bedömde jag. Hela projektet är nu betydligt bättre
 strukturerat vilket gör att ändringar blir enklare. Felrapporteringen är nu 
@@ -310,7 +431,7 @@ ett för stort ämne att börja på nu. \\
 \noindent\rule{\textwidth}{1pt}
 
 \noindent 
-Jag har lagt till små förbättringar till generator och testerna. Bland annat 
+Jag har lagt till små förbättringar till generatorn och analysatorn. Bland annat 
 klarar kodgeneratorn nu externa funktionsanrop, if-satser samt typkonversioner. 
 \\
 
@@ -338,7 +459,7 @@ förbättringar till felmeddelanden.\\
 \noindent\rule{\textwidth}{1pt}
 
 \noindent 
-Prestanda-tester har nu lagds till, så att man enkelt kan se hur lång tid varje
+Prestanda-tester har nu lagts till, så att man enkelt kan se hur lång tid varje
 komponent i kompilatorn tar. Fixade även några små fel som jag hittade.\\
 
 \noindent\textbf{2018-01-21}\\
@@ -359,8 +480,7 @@ samt sematiska kontroller och felmeddelande är betydligt bättre i jämförelse
 teorin skulle man kunna skriva vilka program som helst i det. 
 
 \section{Diskussion och slutsatser}
-
-
+This section's content...
 
 \section{Källförteckning}
 This section's content...

@@ -175,8 +175,7 @@ perfekt för ändamålet.
 
 \end{itemize}
 
-\noindent \textbf{Några specifika specifikationer på språket kommer vara
-följande:}
+\noindent \textbf{Några specifikationer på språket kommer vara följande:}
 
 \begin{itemize}
 	\item Stöd för \textit{nested} kommentarer och funktioner
@@ -224,7 +223,7 @@ följande:}
 		slipper detta. Listor behövs för nästan alla projekt, och bör vara
 		inbyggda i språket.
 
-	\item Tagged unions
+	\item \textit{Tagged unions}
 
 		En union är en datatyp som kan ha en av flera definerade typer. I C
 		vet man inte vilken av typerna unionen har. Detta gör att man själv
@@ -306,11 +305,11 @@ implementeras. \\
 Idag blev första \textit{parser}-prototypen färdig. Ett gränssnitt för AST:s 
 blev skrivet, och logisk utmatning lades till så att man enkelt och grafiskt kan
 se hur trädet är uppbyggt. Parsern är en så kallad \textit{recursive descent
-parser}, som använder tokens från \textit{lexern} samt AST-gränsittet för att konstruera
-ett träd. Just nu stödjer det bland annat hantering av funktioner och block,
-med logiska felrapporter. Ett problem med syntaxen för flerradiga kommentarer
-som orsakade fel resultat i vissa specifika fall hittades. Därför ändrades koden
-i \textit{lexern} för att lösa detta.  \\
+parser}, som använder tokens från \textit{lexern} samt AST-gränsittet för att
+konstruera ett träd. Just nu stödjer det bland annat hantering av funktioner och
+block, med logiska felrapporter. Ett problem med syntaxen för flerradiga
+kommentarer som orsakade fel resultat i vissa specifika fall hittades. Därför
+ändrades koden i \textit{lexern} för att lösa detta.  \\
 
 \noindent\textbf{2017--10--20}\\
 \noindent\rule{\textwidth}{1pt}
@@ -480,16 +479,19 @@ pekare, funktioner, unioner, enumerationer, strukturer samt typdefinitioner.\\
 
 \subsection{Resultatet}
 
-\noindent\textbf{Slutresultatet kan hittas här: }
-\url{https://github.com/ErikWallstrom/Erwall}\\
+\noindent Resultatet blev en fullt fungerande kompilator och programmeringsspråk
+som i teorin kan användas för att skriva vilka program som helst. Språket har
+ett betydligt mer avancerat typsystem och bättre semantiska kontroller samt
+felmeddelanden jämfört med C. Många av de mål som sattes i början av projektet
+blev uppnådda. Erwall är kompatibel med C, stödjer \textit{nested} kommentarer
+och funktioner, har ett strikt typsystem med riktiga konstanter samt saknar
+odefinerat beteende. Kraven på att ha listor som första klassens medborgare,
+garanterade \textit{tail call} optimeringar och \textit{tagged unions} blev dock
+inte implementerade, på grund av tidsbrist samt andra komplikationer. Dessa 
+kommer att lämnas för framtida utveckling. \\
 
-\noindent Kompilatorn och språket är långt ifrån klart. Många av
-specifikationerna som sattes i början av projektet han inte bli färdiga. Dock så
-är Erwall nu ett fungerande programmeringsspråk som jag bland annat använde en
-matematiklektion, vilket tyder på att det redan är användbart och på vissa sätt
-till och med bättre än C. Bland annat är typsystemet betydligt mer avancerat,
-och konstanter samt sematiska kontroller och felmeddelande är betydligt bättre i
-jämförelse. I teorin skulle man kunna skriva vilka program som helst i det.\\
+\noindent\textbf{Källkoden samt mer information kan hittas här: }\\
+\url{https://github.com/ErikWallstrom/Erwall}\\
 
 \begin{figure}
 	\centering
@@ -517,19 +519,74 @@ jämförelse. I teorin skulle man kunna skriva vilka program som helst i det.\\
 
 \section{Diskussion och slutsatser}
 
+Den första frågeställningen, ``Vilka delar en kompilator är uppbyggd av?'', blev 
+besvarad i metoddelen, då detta framgick från nogrann efterforskning som gjordes
+i början av projektet eftersom att det var nödvändigt för planering. Anledningen
+till varför den är uppbyggd som den är kom fram ganska snabbt när andra metoder
+testades under projektets gång; vidareutvecklingsmöjligheter. När kompilatorn
+delas upp i flera olika komponenter blir det betydligt enklare för
+programmeraren att lägga till och förbättra befintliga delar av kompilatorn.
+Varje komponent kan motsvaras till ett steg i en instruktionsbok, och varje
+komponent är gjord så att den på enklast möjligast sätt kan utföra det som den
+är avsedd för. Resultatet skickas vidare till nästa komponent och så vidare.
+Detta gör att man slipper generalisera komponenter, och på så sätt göra det
+enklare och snabbare att utveckla. Detta besvarar även frågeställningen ``Hur 
+ska man planera ett projekt för att tillåta enkel felsökning och tillägg av nya 
+funktioner?'' till stor del.
+
+Eftersom att kompilatorn var helt skriven i C kunde frågeställningen ``Hur bra
+fungerar C som ett programmeringsspråk för att skapa en kompilator?'' besvaras. 
+En stor del av tiden användes för att implementera gränssnitt för funktioner som
+inte finns i standardbiblioteket för C. Dessutom har C få abstraktioner som hade
+kunnat förenkla utvecklingen för komilatorn. Hade ett språk som till exempel 
+Python använts istället hade projektet eventuellt kunnat ha kommit längre. Dock
+hade kompilatorn förmodligen varit lite långsammare. Andra färdigskrivna API:er
+hade även kunnat användas för att spara tid. Slutresultatet för projektet var
+dock en fungerande kompilator med bra prestation, så man kan ändå dra slutsatsen
+att C fungerar ganska bra för att skapa en kompilator. Dessutom visade det sig
+att många stora språks kompilatorer också är skrivna i C, vilket stärker min
+slutsats.
+
+Det visade sig att C är ett ganska jobbigt språk att generera kod till, då 
+språket saknar många funktioner som ett modernt språk generellt har. Detta 
+betyder att man behöver jobba runt många problem, och använda fulhack för att 
+implementera dessa funktioner. Detta var ganska tidskrävande och ledde lätt till
+fel. Man hade kunnat använda LLVM istället för att översätta till C kod, vilket
+förmodligen hade gjort det enklare, men detta hade också varit tidskrävande då
+det är ett väldigt stort och dåligt dokumenterat projekt. Slutprodukten visar 
+dock att koden som genereras blir väldigt högpresterande, och hade kunnat köras
+på de allra flesta enheter då C är ett väldigt portabelt och moget språk. 
+
+Jag blev ganska nöjd med resultatet, och lärde mig ganska mycket under
+projektets gång. Syftet med projektet var ju bland annat att skapa ett 
+programmeringsspråk som är bättre än C, och det tycker jag att jag har lyckats
+med ganska bra. Det var många saker som jag inte implementerade, och den absolut
+största anledningen var ju tidsbrist, men detta hade jag i räknat med. Jag
+kommer att fortsätta att utveckla detta projektet, och inom snar framtid tror 
+jag att jag kommer att ha lyckats att skapa ett språk som verkligen kan ersätta
+C. 
+
 \section{Källförteckning}
 
-\url{https://medium.freecodecamp.org/
-the-programming-language-pipeline-91d3f449c919}\\\\
-\url{https://en.wikipedia.org/wiki/Lexical_analysis}\\\\
-\url{https://en.wikipedia.org/wiki/Recursive_descent_parser}\\\\
-\url{https://en.wikipedia.org/wiki/Abstract_syntax_tree}\\\\
-\url{https://en.wikipedia.org/wiki/Symbol_table}\\\\
-\url{https://en.wikipedia.org/wiki/Semantics_ (computer_science)}\\\\
-\url{https://github.com/odin-lang/Odin}\\\\
-\url{https://github.com/BSVino/JaiPrimer/blob/master/JaiPrimer.md}\\\\
-\url{https://inductive.no/jai/}\\\\
-\url{https://stackoverflow.com/questions/21945891/how-do-i-check-whether-all-code\\-paths-return-a-value}\\\\
-\url{https://stackoverflow.com/questions/1825298/your-favourite-abstract-syntax\\-tree-optimization}\\\\
+William W Wold (2017). I wrote a programming language. 
+
+\url{https://medium.freecodecamp.org/the-programming-language-
+	pipeline-91d3f449c919} [2017--10--12]\\\\
+Wikipedia (2017) Lexical Analysis
+
+\url{https://en.wikipedia.org/wiki/Lexical_analysis} [2017--10--12]\\\\
+Wikipedia (2017) Recursive Descent Parser
+
+\url{https://en.wikipedia.org/wiki/Recursive_descent_parser} [2017--10--12]\\\\
+Wikipedia (2017) Abstract Syntax Tree
+
+\url{https://en.wikipedia.org/wiki/Abstract_syntax_tree} [2017--10--12]\\\\
+Wikipedia (2017) Symbol Table 
+
+\url{https://en.wikipedia.org/wiki/Symbol_table} [2017--10--12]\\\\
+Wikipedia (2017) Semantics
+
+\url{https://en.wikipedia.org/wiki/Semantics_ (computer_science)} [2017--10--12]
+\\\\
 
 \end{document}
